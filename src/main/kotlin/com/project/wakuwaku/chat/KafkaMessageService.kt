@@ -16,8 +16,9 @@ import java.io.IOException
 
 @Service
 class KafkaMessageService @Autowired constructor(
-        private val kafkaTemplate: KafkaTemplate<String, KafkaMessageDto>,
-        private val chatService: ChatService
+        var kafkaTemplate: KafkaTemplate<String, KafkaMessageDto>,
+        private val chatService: ChatService,
+        private val template: SimpMessagingTemplate // WebSocket 메시지 전송을 위한 SimpMessagingTemplate
 ) {
 
     private val log = LoggerFactory.getLogger(javaClass)
@@ -26,8 +27,8 @@ class KafkaMessageService @Autowired constructor(
     fun send(topic: String?, messageDto: Chatting) {
         log.info("send Message : " + messageDto.content)
         try {
-            val responseMessageDto: KafkaMessageDto = chatService!!.SaveAndChangeToMessageResponseDto(messageDto)
-            kafkaTemplate!!.send(topic!!, responseMessageDto)
+            val responseMessageDto: KafkaMessageDto = chatService.SaveAndChangeToMessageResponseDto(messageDto)
+            kafkaTemplate.send(topic!!, responseMessageDto)
         } catch (e: Exception) {
             e.printStackTrace()
             //throw RestException(HttpStatus.NOT_ACCEPTABLE, "SAVE Failed")
@@ -35,11 +36,10 @@ class KafkaMessageService @Autowired constructor(
     }
 
     //consumer
-    private val sendingOperations: SimpMessageSendingOperations? = null
-    private val template: SimpMessagingTemplate? = null
     @KafkaListener(topics = [KafkaConstants.KAFKA_TOPIC])
     @Throws(IOException::class)
     fun consume(responseMessageDto: KafkaMessageDto) {
+        log.info("consume Message : " + responseMessageDto.content)
         template?.convertAndSend("/topic/" + responseMessageDto.id, responseMessageDto)
     }
 }
