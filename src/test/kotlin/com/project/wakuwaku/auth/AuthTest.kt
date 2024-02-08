@@ -6,17 +6,13 @@ import com.project.wakuwaku.config.auth.JwtInfo
 import com.project.wakuwaku.config.auth.JwtUtil
 import com.project.wakuwaku.model.jpa.user.UserRepository
 import com.project.wakuwaku.model.jpa.user.Users
-import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.io.Decoders
-import io.jsonwebtoken.security.Keys
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import java.time.LocalDateTime
 import java.util.*
@@ -29,12 +25,21 @@ class AuthTest @Autowired constructor(
     private val userRepository: UserRepository,
     private val jwtUtil: JwtUtil
 ) {
+
+    @DisplayName("JWT 생성 테스트")
+    @Test
+    fun testCreateJwt() {
+        val result = jwtUtil.createJwt("홍길동")
+
+        Assertions.assertNotNull(result)
+    }
+
     @DisplayName("로그인 성공 테스트(성공시 jwt 생성)")
     @Test
     fun testLoginSuccess() {
         val newUser = Users(
             id = "id",
-            password = "pw",
+            password = "\$2a\$12\$7iKkXT2drx7q5aqUMIYaKOfMGj5HrmlkU0UDocYpPrLRg3PP3gKBC",   // world 암호화
             userType = 1,
             name = "name",
             nickname = "testNickname",
@@ -44,7 +49,7 @@ class AuthTest @Autowired constructor(
 
         userRepository.save(newUser)
 
-        val result: JwtInfo = authService.login(LoginDto(newUser.id, newUser.password))
+        val result: JwtInfo = authService.login(LoginDto(newUser.id, "world"))
         assertEquals("id", jwtUtil.getClaim(result.accessToken)?.body?.get("userName"))
     }
 

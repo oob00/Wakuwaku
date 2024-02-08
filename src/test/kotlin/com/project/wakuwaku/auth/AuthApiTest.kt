@@ -26,14 +26,14 @@ class AuthApiTest {
 
     @BeforeAll
     fun beforeAll() {
-        userRepository.save(Users(1L, "id", "pw", 1, "name", "nickname", LocalDateTime.now(), LocalDateTime.now()))
+        userRepository.save(Users(1L, "hello", "\$2a\$12\$7iKkXT2drx7q5aqUMIYaKOfMGj5HrmlkU0UDocYpPrLRg3PP3gKBC", 1, "name", "nickname", LocalDateTime.now(), LocalDateTime.now()))
     }
 
-    @Test
     @DisplayName("로그인 API 테스트")
+    @Test
     fun testLogin () {
 
-        val loginDto = LoginDto("test", "test")
+        val loginDto = LoginDto("hello", "world")
         val loginDtoJson = objectMapper.writeValueAsString(loginDto)
 
         mockMvc.post("/api/auth/login")
