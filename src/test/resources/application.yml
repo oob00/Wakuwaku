@@ -21,3 +21,6 @@ de:
 
 kafka:
   hosts: localhost:9092
+
+jwt:
+  secret: and0LWdlbmVyYXRlLXNlY3JldC1rZXktb29iLWt5dy1rbmV1ZHJmaA==
