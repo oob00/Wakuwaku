@@ -13,10 +13,10 @@
             <!-- 메시지 목록이 동적으로 추가됩니다. -->
         </ul>
     </div>
-    <form id="messageForm">
-        <input type="text" id="message" placeholder="Type a message..."/>
-        <button type="submit">Send</button>
-    </form>
+    <input type="text" id="topic" placeholder="Type a topic..."/>
+    <button id="chatroomBtn" type="button">Enter</button>
+    <input type="text" id="message" placeholder="Type a message..."/>
+    <button id="messageBtn" type="button">Send</button>
 </div>
 
 <script th:inline="javascript">
@@ -24,22 +24,36 @@
     $(function () {
         var socket = new SockJS('http://localhost:8080/chat'); // 서버의 WebSocket 연결 주소
         var stompClient = Stomp.over(socket);
+        var currentSubscription = null; // 현재 구독을 저장할 변수
 
         stompClient.connect({}, function (frame) {
             console.log('Connected: ' + frame);
-
-            // 서버로부터 메시지 수신을 위한 구독 설정
-            stompClient.subscribe('/topic/test', function (message) {
-                showMessage(JSON.parse(message.body).content);
-            });
         });
 
-        $('#messageForm').submit(function (event) {
+        $('#chatroomBtn').on("click", function (event) {
+            var topic = $('#topic').val();
+
+            // 기존 구독 해제
+            if (currentSubscription != null) {
+                currentSubscription.unsubscribe();
+                console.log('Unsubscribed from current topic');
+            }
+
+            // 서버로부터 메시지 수신을 위한 구독 설정
+            currentSubscription = stompClient.subscribe('/topic/'+topic, function (message) {
+                showMessage(JSON.parse(message.body).content);
+            });
+
+            showMessage(topic+" 채팅방에 접속하였습니다.");
+        });
+
+        $('#messageBtn').on("click", function (event) {
             event.preventDefault();
             var messageContent = $('#message').val();
+            var topic = $('#topic').val();
             if (messageContent && stompClient) {
                 var chatMessage = {
-                    id: 'test',
+                    id: topic,
                     content: messageContent,
                 };
                 stompClient.send("/pub/message", {}, JSON.stringify(chatMessage));
