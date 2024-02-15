@@ -5,4 +5,6 @@ import java.util.Optional
 
 interface UserRepository : JpaRepository<Users, Long> {
     fun findById(id: String): Optional<Users>
+
+    fun existsById(id: String): Boolean
 }

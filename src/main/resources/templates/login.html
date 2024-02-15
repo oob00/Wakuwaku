@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>로그인</title>
@@ -11,6 +11,7 @@
     <input type="password" id="pw" name="pw" placeholder="비밀번호">
     <button type="submit" id="login_btn">로그인</button>
   </form>
+    <a th:href="'https://kauth.kakao.com/oauth/authorize?response_type=code&client_id='+${@environment.getProperty('spring.security.oauth2.client.registration.kakao.client-id')}+'&redirect_uri='+${@environment.getProperty('url.base')}">카카오 로그인</a>
 </div>
 </body>
 </html>
