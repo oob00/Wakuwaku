@@ -1,11 +1,10 @@
 package com.project.wakuwaku.auth
 
+import com.project.wakuwaku.auth.dto.KakaoProfile
 import com.project.wakuwaku.auth.dto.KakaoToken
 import com.project.wakuwaku.auth.dto.LoginDto
 import com.project.wakuwaku.config.auth.JwtInfo
 import com.project.wakuwaku.model.jpa.user.UserRepository
-import net.minidev.json.JSONObject
-import net.minidev.json.parser.JSONParser
 import org.springframework.http.*
 import org.springframework.stereotype.Service
 import org.springframework.util.LinkedMultiValueMap
@@ -44,7 +43,7 @@ class KakaoService(
         return response.body as KakaoToken
     }
 
-    fun getUserInfo(token: KakaoToken): Long {
+    fun getUserInfo(token: KakaoToken): KakaoProfile {
         val parameters: MultiValueMap<String, String> = LinkedMultiValueMap()
 
         val headers = HttpHeaders()
@@ -56,17 +55,14 @@ class KakaoService(
         val httpEntity = HttpEntity(parameters, headers)
 
 
-        val response: ResponseEntity<String> = restTemplate.exchange(
+        val response: ResponseEntity<KakaoProfile> = restTemplate.exchange(
             "https://kapi.kakao.com/v2/user/me",
             HttpMethod.POST,
             httpEntity,
-            String::class.java
+            KakaoProfile::class.java
         )
 
-        val jsonParser = JSONParser()
-        val info: JSONObject = jsonParser.parse(response.body) as JSONObject
-
-        return info.get("id") as Long
+        return response.body as KakaoProfile
     }
 
     fun kakaoLogin(id: String): JwtInfo {
