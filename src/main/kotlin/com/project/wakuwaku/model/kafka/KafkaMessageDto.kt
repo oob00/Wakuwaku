@@ -11,7 +11,7 @@ data class KafkaMessageDto(
         var id: String? = null,
 
         @field:NotNull
-        var chatNo: Int? = null,
+        var chatRoomId: String? = null,
 
         @field:NotNull
         var contentType: String? = null,
@@ -19,32 +19,30 @@ data class KafkaMessageDto(
         @field:NotNull
         var content: String? = null,
 
+        var senderId: String? = null,
         var senderName: String? = null,
-        var senderNo: Int? = null,
-
-        @field:NotNull
-        var saleNo: Int? = null,
 
         var sendTime: Long = 0,
         var readCount: Int = 0,
         var senderEmail: String? = null
 ) : Serializable {
 
-    fun setSendTimeAndSender(sendTime: LocalDateTime, senderNo: Int, senderName: String, readCount: Int) {
+    fun setSendTimeAndSender(sendTime: LocalDateTime, senderId: String, senderName: String, readCount: Int) {
         this.senderName = senderName
         this.sendTime = sendTime.atZone(ZoneId.of("Asia/Seoul")).toInstant().toEpochMilli()
-        this.senderNo = senderNo
+        this.senderId = senderId
         this.readCount = readCount
     }
 
     fun convertEntity(): Chatting = Chatting(
             id = id,
-            chatRoomNo = chatNo,
-            senderNo = senderNo,
+            chatRoomId = chatRoomId,
+            senderId = senderId,
             senderName = senderName,
             contentType = contentType,
             content = content,
             sendDate = Instant.ofEpochMilli(sendTime).atZone(ZoneId.of("Asia/Seoul")).toLocalDateTime(),
             readCount = readCount
     )
+
 }

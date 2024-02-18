@@ -40,7 +40,7 @@ class SecurityConfig {
                     .loginProcessingUrl("/check")
                     .usernameParameter("id")
                     .passwordParameter("pw")
-                    .defaultSuccessUrl("/chat", true)
+                    .defaultSuccessUrl("/chat/", true)
                     .permitAll()
             }
 

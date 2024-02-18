@@ -1,6 +1,7 @@
 package com.project.wakuwaku.chat
 
 import com.project.wakuwaku.model.kafka.KafkaMessageDto
+import com.project.wakuwaku.model.mongo.ChatRepository
 import com.project.wakuwaku.model.mongo.Chatting
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service
 class ChatService @Autowired constructor(
         private val chatRepository: ChatRepository
 ){
+
     fun SaveAndChangeToMessageResponseDto(messageDto: Chatting): KafkaMessageDto {
 
         chatRepository.save(messageDto)

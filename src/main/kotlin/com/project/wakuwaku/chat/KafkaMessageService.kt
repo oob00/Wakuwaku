@@ -40,6 +40,6 @@ class KafkaMessageService @Autowired constructor(
     @Throws(IOException::class)
     fun consume(responseMessageDto: KafkaMessageDto) {
         log.info("consume Message : " + responseMessageDto.content)
-        template?.convertAndSend("/topic/" + responseMessageDto.id, responseMessageDto)
+        template?.convertAndSend("/topic/" + responseMessageDto.chatRoomId, responseMessageDto)
     }
 }

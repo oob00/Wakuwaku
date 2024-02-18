@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Websocket ChatRoom</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/4.3.1/dist/css/bootstrap.min.css}">
+    <style>
+        [th\\:cloak] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container" id="app" th:cloak>
+    <div class="row">
+        <div class="col-md-6">
+            <h4 id="subject" th:text="${roomName}"><span class="badge badge-info badge-pill"></span></h4>
+            <h4 id="userCount" th:text="'현재 ' + ${userCount} + ' 명 접속중'"><span class="badge badge-info badge-pill"></span></h4>
+        </div>
+        <div class="col-md-6 text-right">
+            <a class="btn btn-primary btn-sm" href="/logout">로그아웃</a>
+            <a class="btn btn-info btn-sm" href="/chat/">채팅방 나가기</a>
+        </div>
+    </div>
+    <div class="input-group">
+        <div class="input-group-prepend">
+            <label class="input-group-text">내용</label>
+        </div>
+        <input type="text" class="form-control" th:value="${message}" onkeydown="if(event.key === 'Enter') sendMessage('TALK');">
+        <div class="input-group-append">
+            <button class="btn btn-primary" type="button" onclick="sendMessage('TALK')">보내기</button>
+        </div>
+    </div>
+    <ul class="list-group">
+        <li class="list-group-item" th:each="message : ${messages}">
+            <span th:text="${message.sender} + ' - ' + ${message.message}"></span>
+        </li>
+    </ul>
+</div>
+<!-- JavaScript -->
+<script th:src="@{/webjars/axios/0.17.1/dist/axios.min.js}"></script>
+<script th:src="@{/webjars/sockjs-client/1.1.2/sockjs.min.js}"></script>
+<script th:src="@{/webjars/stomp-websocket/2.3.3-1/stomp.min.js}"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+
+    // websocket & stomp initialize
+    var sock = new SockJS('http://localhost:8080/chat');
+    var ws = Stomp.over(sock);
+
+    // 초기 데이터 설정
+    var roomId = localStorage.getItem('wschat.roomId');
+    var roomName = localStorage.getItem('wschat.roomName');
+    var userCount = 0;
+
+    // 채팅 메시지 보내는 함수
+    function sendMessage(type) {
+        var messageInput = document.querySelector('input[class="form-control"]');
+        var message = messageInput.value.trim();
+        if (message === '') {
+            alert("메시지를 입력해 주세요.");
+            return;
+        }
+        ws.send("/pub/message", {}, JSON.stringify({type:type, chatRoomId:roomId, content:message}));
+        messageInput.value = '';
+    }
+
+    // 메시지 수신 함수
+    function recvMessage(recv) {
+
+        var messageList = document.getElementsByClassName('list-group')[0];
+        var li = document.createElement('li');
+        li.className = 'list-group-item';
+        li.innerText = recv.senderId + ' - ' + recv.content;
+        messageList.appendChild(li);
+
+        getUserCount(roomId)
+    }
+
+    //유저수 변경
+    function getUserCount(roomId){
+
+        var params = new URLSearchParams();
+        params.append("roomId", roomId);
+        axios.post('/chat/room/userCount', params)
+            .then(function (response) {
+                var userCount = response.data;
+                var h4 = document.getElementById("userCount")
+                h4.innerText = '현재 '+userCount+' 명 접속중'
+            })
+            .catch(function (error) {
+                console.log(error)
+            });
+    }
+
+    // 서버와 연결
+    ws.connect({}, function(frame) {
+        // 연결 성공
+        ws.subscribe("/topic/"+roomId, function(message) {
+            var recv = JSON.parse(message.body);
+            recvMessage(recv);
+        });
+    }, function(error) {
+        // 연결 실패
+        alert("서버 연결에 실패하였습니다. 다시 접속해 주십시요. roomId:"+roomId);
+        location.href = "/chat/";
+    });
+
+    //]]>
+</script>
+</body>
+</html>
