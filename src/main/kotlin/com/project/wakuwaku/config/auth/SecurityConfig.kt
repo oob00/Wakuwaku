@@ -9,13 +9,15 @@ import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfig {
+class SecurityConfig(
+    private val jwtUtil: JwtUtil
+) {
 
     @Bean
     fun passwordEncoder(): PasswordEncoder {
@@ -30,7 +32,7 @@ class SecurityConfig {
             .cors { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) }
             .authorizeHttpRequests {
-                it.requestMatchers("/api/auth/**").permitAll()
+                it.requestMatchers("/api/auth/**", "/auth/kakao/callback").permitAll()
                 it.dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
                 it.anyRequest().authenticated()
             }
@@ -43,6 +45,7 @@ class SecurityConfig {
                     .defaultSuccessUrl("/chat/", true)
                     .permitAll()
             }
+            .addFilterBefore(JwtAuthFilter(jwtUtil), UsernamePasswordAuthenticationFilter::class.java)
 
         return http.build()
     }

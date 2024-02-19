@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    include: kakao
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
     url: jdbc:mariadb://localhost:3306/wakuwaku?autoReconnect=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Seoul

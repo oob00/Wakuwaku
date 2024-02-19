@@ -1,18 +1,22 @@
 package com.project.wakuwaku.config.auth
 
 import io.jsonwebtoken.Claims
-import io.jsonwebtoken.Jws
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
+import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Component
 import java.time.Duration
 import java.util.*
 
 @Component
-class JwtUtil {
+class JwtUtil(
+    private val customUserDetailService: CustomUserDetailService
+) {
 
     @Value("\${jwt.secret}")
     lateinit var secretKey: String
@@ -30,7 +34,25 @@ class JwtUtil {
         return JwtInfo("Bearer", accessToken)
     }
 
-    fun getClaim(token: String): Jws<Claims>? {
-        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token)
+    fun resolveToken(request: HttpServletRequest): String? {
+        return request.getHeader("Authorization")
+    }
+
+    fun getAuthentication(token: String): Authentication {
+        val userDetails = customUserDetailService.loadUserByUsername(getClaim(token)["userName"].toString())
+        return UsernamePasswordAuthenticationToken(userDetails, "", userDetails.authorities)
+    }
+
+    fun getClaim(token: String): Claims {
+        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).body
+    }
+
+    fun validateToken(token: String): Boolean {
+        return try {
+            val claims = getClaim(token)
+            !claims.expiration.before(Date())
+        } catch (e: Exception) {
+            false
+        }
     }
 }

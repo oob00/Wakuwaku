@@ -50,7 +50,7 @@ class AuthTest @Autowired constructor(
         userRepository.save(newUser)
 
         val result: JwtInfo = authService.login(LoginDto(newUser.id, "world"))
-        assertEquals("id", jwtUtil.getClaim(result.accessToken)?.body?.get("userName"))
+        assertEquals("id", jwtUtil.getClaim(result.accessToken)["userName"])
     }
 
     @DisplayName("로그인 실패 테스트(아이디가 존재하지 않는 경우)")
