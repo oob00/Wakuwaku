@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>메인페이지</title>
 </head>
 <body>
 로그인 성공
@@ -13,5 +13,22 @@
     <li th:text="'닉네임 : ' + ${nickname}"></li>
     <li th:text="'토큰 : ' + ${token?.accessToken}"></li>
 </ul>
+
+<br><br>
+
+<button th:onclick="moveToChatRoom()">채팅방 이동</button>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script th:inline="javascript">
+    function moveToChatRoom() {
+        axios.get('/chat/', {
+            headers: {
+                Authorization: [[${token?.accessToken}]]
+            }
+        }).then(function () {
+            location.href='/chat/'
+        });
+    }
+</script>
 </body>
 </html>

@@ -77,7 +77,7 @@ class KakaoService(
         val jwt: JwtInfo = if (!exist) {
             val user = Users(
                 id = profile.id.toString(),
-                password = null,
+                password = "",
                 userType = 2,
                 email = profile.kakao_account.email,
                 name = profile.kakao_account.name,
