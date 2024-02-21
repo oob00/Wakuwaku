@@ -29,7 +29,8 @@ class AuthTest @Autowired constructor(
     @DisplayName("JWT 생성 테스트")
     @Test
     fun testCreateJwt() {
-        val result = jwtUtil.createJwt("홍길동")
+        val user = Users(1, "id", "password", 1, "name", "nickname", LocalDateTime.now(), LocalDateTime.now())
+        val result = jwtUtil.createJwt(user)
 
         Assertions.assertNotNull(result)
     }
@@ -50,7 +51,7 @@ class AuthTest @Autowired constructor(
         userRepository.save(newUser)
 
         val result: JwtInfo = authService.login(LoginDto(newUser.id, "world"))
-        assertEquals("id", jwtUtil.getClaim(result.accessToken)["userName"])
+        assertEquals("id", jwtUtil.getClaim(result.accessToken)["id"])
     }
 
     @DisplayName("로그인 실패 테스트(아이디가 존재하지 않는 경우)")

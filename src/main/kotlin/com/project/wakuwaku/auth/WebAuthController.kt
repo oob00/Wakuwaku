@@ -20,7 +20,7 @@ class WebAuthController(
     @GetMapping("/index")
     fun home(model: Model, auth: Authentication): String {
         val user = authService.getUserById(auth.name)
-        val token = jwtUtil.createJwt(user.id)
+        val token = jwtUtil.createJwt(user)
 
         model.addAttribute("nickname", user.nickname)
         model.addAttribute("token", token)

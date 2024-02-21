@@ -2,8 +2,8 @@ package com.project.wakuwaku.auth
 
 import com.project.wakuwaku.auth.dto.KakaoProfile
 import com.project.wakuwaku.auth.dto.KakaoToken
-import com.project.wakuwaku.auth.dto.LoginDto
 import com.project.wakuwaku.config.auth.JwtInfo
+import com.project.wakuwaku.config.auth.JwtUtil
 import com.project.wakuwaku.model.jpa.user.UserRepository
 import org.springframework.http.*
 import org.springframework.stereotype.Service
@@ -14,7 +14,7 @@ import org.springframework.web.client.RestTemplate
 @Service
 class KakaoService(
     private val userRepository: UserRepository,
-    private val authService: AuthService
+    private val jwtUtil: JwtUtil
 ) {
 
     fun getToken(code: String): KakaoToken {
@@ -68,12 +68,12 @@ class KakaoService(
     fun kakaoLogin(id: String): JwtInfo {
         val exist: Boolean = userRepository.existsById(id)
 
-        val jwt: JwtInfo
-        jwt = if (!exist) {
+        val jwt: JwtInfo = if (!exist) {
             TODO("회원 가입")
-            authService.login(LoginDto(id, "pw"))
+            //jwtUtil.createJwt(id)
         } else {
-            authService.login(LoginDto(id, "pw"))
+            val user = userRepository.findById(id).get()
+            jwtUtil.createJwt(user)
         }
 
         return jwt

@@ -1,5 +1,6 @@
 package com.project.wakuwaku.config.auth
 
+import com.project.wakuwaku.model.jpa.user.Users
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
@@ -23,9 +24,11 @@ class JwtUtil(
 
     private val key by lazy { Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey)) }
 
-    fun createJwt(userName: String): JwtInfo {
+    fun createJwt(users: Users): JwtInfo {
         val accessToken = Jwts.builder()
-            .claim("userName", userName)
+            .claim("seq", users.seq)
+            .claim("id", users.id)
+            .claim("nickname", users.nickname)
             .setIssuedAt(Date())
             .setExpiration(Date(Date().time + Duration.ofHours(1).toMillis()))
             .signWith(key, SignatureAlgorithm.HS256)
@@ -39,7 +42,7 @@ class JwtUtil(
     }
 
     fun getAuthentication(token: String): Authentication {
-        val userDetails = customUserDetailService.loadUserByUsername(getClaim(token)["userName"].toString())
+        val userDetails = customUserDetailService.loadUserByUsername(getClaim(token)["id"].toString())
         return UsernamePasswordAuthenticationToken(userDetails, "", userDetails.authorities)
     }
 

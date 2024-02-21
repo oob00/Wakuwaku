@@ -20,7 +20,9 @@ class AuthService(
         val authenticationToken = UsernamePasswordAuthenticationToken(dto.id, dto.pw)
         val authentication = authenticationManagerBuilder.`object`.authenticate(authenticationToken)
 
-        return jwtUtil.createJwt(authentication.name)
+        val user = userRepository.findById(authentication.name).get()
+
+        return jwtUtil.createJwt(user)
     }
 
     fun getUserById(id: String): Users {
