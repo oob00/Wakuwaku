@@ -5,7 +5,6 @@ import com.project.wakuwaku.model.mongo.Chatting
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.security.core.Authentication
-import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RestController
 import java.util.concurrent.ExecutionException
 
@@ -16,11 +15,11 @@ class ChatController @Autowired constructor(
 
     @MessageMapping("/message")
     @Throws(ExecutionException::class, InterruptedException::class)
-    fun sendMessage(authentication: Authentication, message: Chatting?) {
+    fun sendMessage(authentication: Authentication, chat: Chatting?) {
         //메세지 서비스 로직
-        if (message != null) {
-            message.setSenderInfo(authentication)
-            kafkaMessageService.send(KafkaConstants.KAFKA_TOPIC, message)
+        if (chat != null) {
+            chat.setSenderInfo(authentication)
+            kafkaMessageService.send(KafkaConstants.KAFKA_TOPIC, chat)
         }
     }
 

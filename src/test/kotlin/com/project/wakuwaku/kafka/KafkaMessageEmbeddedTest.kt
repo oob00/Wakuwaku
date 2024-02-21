@@ -4,9 +4,12 @@ import com.project.wakuwaku.chat.KafkaMessageService
 import com.project.wakuwaku.config.kafka.KafkaConstants
 import com.project.wakuwaku.model.kafka.KafkaMessageDto
 import com.project.wakuwaku.model.mongo.Chatting
+import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.kafka.common.serialization.StringSerializer
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -34,8 +37,10 @@ class KafkaMessageEmbeddedTest {
     @Autowired
     private lateinit var embeddedKafkaBroker: EmbeddedKafkaBroker
 
-    @Test
-    fun `test send and consume message`() {
+    private lateinit var consumer: Consumer<String, KafkaMessageDto>
+
+    @BeforeEach
+    fun setUp(){
         val producerProps = KafkaTestUtils.producerProps(embeddedKafkaBroker)
         val producerFactory = DefaultKafkaProducerFactory<String, KafkaMessageDto>(producerProps, StringSerializer(), JsonSerializer<KafkaMessageDto>())
         val kafkaTemplate = KafkaTemplate(producerFactory)
@@ -47,9 +52,18 @@ class KafkaMessageEmbeddedTest {
         consumerProps["value.deserializer"] = JsonDeserializer::class.java
         consumerProps["group.id"] = KafkaConstants.GROUP_ID
         val consumerFactory = DefaultKafkaConsumerFactory<String, KafkaMessageDto>(consumerProps, StringDeserializer(), JsonDeserializer(KafkaMessageDto::class.java))
-        val consumer = consumerFactory.createConsumer()
+        consumer = consumerFactory.createConsumer()
         consumer.subscribe(listOf(KafkaConstants.KAFKA_TOPIC))
         embeddedKafkaBroker.consumeFromAllEmbeddedTopics(consumer)
+    }
+
+    @AfterEach
+    fun tearDown(){
+        consumer.close()
+    }
+
+    @Test
+    fun `test send and consume message`() {
 
         val testMessage = Chatting("testId", content = "Test Message")
         kafkaMessageService.send(KafkaConstants.KAFKA_TOPIC, testMessage)
@@ -58,8 +72,7 @@ class KafkaMessageEmbeddedTest {
         val receivedMessage = records.records(KafkaConstants.KAFKA_TOPIC).iterator().next().value()
 
         assertEquals(testMessage.content, receivedMessage.content)
-
-        consumer.close()
     }
+
 }
 
