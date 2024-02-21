@@ -5,11 +5,14 @@ import com.project.wakuwaku.auth.dto.KakaoToken
 import com.project.wakuwaku.config.auth.JwtInfo
 import com.project.wakuwaku.config.auth.JwtUtil
 import com.project.wakuwaku.model.jpa.user.UserRepository
+import com.project.wakuwaku.model.jpa.user.Users
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.*
 import org.springframework.stereotype.Service
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
 import org.springframework.web.client.RestTemplate
+import java.time.LocalDateTime
 
 @Service
 class KakaoService(
@@ -17,10 +20,13 @@ class KakaoService(
     private val jwtUtil: JwtUtil
 ) {
 
+    @Value("\${spring.security.oauth2.client.registration.kakao.client-id}")
+    lateinit var secretKey: String
+
     fun getToken(code: String): KakaoToken {
         val parameters: MultiValueMap<String, String> = LinkedMultiValueMap()
         parameters.add("grant_type", "authorization_code")
-        parameters.add("client_id", "1fded70225514d5d76e262cfa79e75bc")
+        parameters.add("client_id", secretKey)
         parameters.add("redirect_uri", "http://localhost:8080/auth/kakao/callback")
         parameters.add("code", code)
 
@@ -65,14 +71,26 @@ class KakaoService(
         return response.body as KakaoProfile
     }
 
-    fun kakaoLogin(id: String): JwtInfo {
-        val exist: Boolean = userRepository.existsById(id)
+    fun kakaoLogin(profile: KakaoProfile): JwtInfo {
+        val exist: Boolean = userRepository.existsById(profile.id.toString())
 
         val jwt: JwtInfo = if (!exist) {
-            TODO("회원 가입")
-            //jwtUtil.createJwt(id)
+            val user = Users(
+                id = profile.id.toString(),
+                password = null,
+                userType = 2,
+                email = profile.kakao_account.email,
+                name = profile.kakao_account.name,
+                nickname = profile.kakao_account.profile.nickname,
+                createDt = LocalDateTime.now(),
+                updateDt = LocalDateTime.now()
+            )
+
+            val saveUser = userRepository.save(user)
+
+            jwtUtil.createJwt(saveUser)
         } else {
-            val user = userRepository.findById(id).get()
+            val user = userRepository.findById(profile.id.toString()).get()
             jwtUtil.createJwt(user)
         }
 

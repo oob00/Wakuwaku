@@ -13,7 +13,8 @@ data class KakaoProfile(
         var email_needs_agreement: Boolean? = null,
         var is_email_valid: Boolean? = null,
         var is_email_verified: Boolean? = null,
-        var email: String? = null
+        var email: String,
+        var name: String
     ) {
         data class Profile(
             var nickname: String,

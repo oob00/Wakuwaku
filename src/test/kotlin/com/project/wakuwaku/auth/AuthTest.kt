@@ -29,7 +29,7 @@ class AuthTest @Autowired constructor(
     @DisplayName("JWT 생성 테스트")
     @Test
     fun testCreateJwt() {
-        val user = Users(1, "id", "password", 1, "name", "nickname", LocalDateTime.now(), LocalDateTime.now())
+        val user = Users(1, "id", "password", 1, "email@email.com", "name", "nickname", LocalDateTime.now(), LocalDateTime.now())
         val result = jwtUtil.createJwt(user)
 
         Assertions.assertNotNull(result)
@@ -42,6 +42,7 @@ class AuthTest @Autowired constructor(
             id = "id",
             password = "\$2a\$12\$7iKkXT2drx7q5aqUMIYaKOfMGj5HrmlkU0UDocYpPrLRg3PP3gKBC",   // world 암호화
             userType = 1,
+            email = "email@email.com",
             name = "name",
             nickname = "testNickname",
             createDt = LocalDateTime.now(),

@@ -12,7 +12,7 @@ class Users(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val seq: Long = 0L,
     val id: String,
-    var password: String,
+    var password: String?,
     val userType: Int,  // wakuwaku=1, kakao=2
     email: String,
     name: String,

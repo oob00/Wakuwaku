@@ -60,7 +60,7 @@ class WebAuthController(
         println("kakao id : ${profile.id}")
         println("kakao token : ${token.access_token}")
 
-        val jwt = kakaoService.kakaoLogin(profile.id.toString())
+        val jwt = kakaoService.kakaoLogin(profile)
 
         println(jwt.accessToken)
 

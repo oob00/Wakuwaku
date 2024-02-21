@@ -32,7 +32,7 @@ class SecurityConfig(
             .cors { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) }
             .authorizeHttpRequests {
-                it.requestMatchers("/api/auth/**", "/auth/kakao/callback").permitAll()
+                it.requestMatchers("/api/auth/**", "/register", "/auth/kakao/callback").permitAll()
                 it.dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
                 it.anyRequest().authenticated()
             }
