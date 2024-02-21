@@ -11,6 +11,8 @@
     <input type="password" id="pw" name="pw" placeholder="비밀번호">
     <button type="submit" id="login_btn">로그인</button>
   </form>
+    <br>
+    <button th:onclick="|location.href='@{/register}'|">회원가입</button>
     <a th:href="'https://kauth.kakao.com/oauth/authorize?response_type=code&client_id='+${@environment.getProperty('spring.security.oauth2.client.registration.kakao.client-id')}+'&redirect_uri='+${@environment.getProperty('url.base')}">카카오 로그인</a>
 </div>
 </body>

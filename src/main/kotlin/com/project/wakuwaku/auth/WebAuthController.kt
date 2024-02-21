@@ -2,11 +2,13 @@ package com.project.wakuwaku.auth
 
 import com.project.wakuwaku.auth.dto.KakaoProfile
 import com.project.wakuwaku.auth.dto.KakaoToken
+import com.project.wakuwaku.auth.dto.RegistUserDto
 import com.project.wakuwaku.config.auth.JwtUtil
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
 
@@ -25,6 +27,23 @@ class WebAuthController(
         model.addAttribute("nickname", user.nickname)
         model.addAttribute("token", token)
         return "index"
+    }
+
+    @GetMapping("/register")
+    fun register(): String {
+        return "register"
+    }
+
+    @PostMapping("/register")
+    fun register(user: RegistUserDto, model: Model): String {
+        val regist = authService.register(user)
+
+        return if (regist) {
+            "login"
+        } else {
+            model.addAttribute("regist", "fail")
+            "register"
+        }
     }
 
     @GetMapping("/login")
