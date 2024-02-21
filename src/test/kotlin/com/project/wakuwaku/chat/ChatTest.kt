@@ -76,7 +76,7 @@ class ChatTest @Autowired constructor(
         user = CreateUser()
 
         val headers = WebSocketHttpHeaders() // 헤더에 토큰 삽입
-        headers.add("Authorization", jwtUtil.createJwt(user.id).accessToken)
+        headers.add("Authorization", jwtUtil.createJwt(user).accessToken)
 
         // init setting
         stompClient = WebSocketStompClient(SockJsClient(listOf(WebSocketTransport(StandardWebSocketClient()))))
@@ -158,6 +158,7 @@ class ChatTest @Autowired constructor(
                 id = "test",
                 password = "test",
                 userType = 1,
+                email = "test@email.com",
                 name = "testName",
                 nickname = "testNickname",
                 createDt = LocalDateTime.now(),
