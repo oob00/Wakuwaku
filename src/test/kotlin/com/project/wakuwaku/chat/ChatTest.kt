@@ -47,7 +47,7 @@ import java.util.concurrent.TimeUnit
 @ExtendWith(SpringExtension::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext
-@EmbeddedKafka(partitions = 1, topics = [KafkaConstants.KAFKA_TOPIC], brokerProperties = ["listeners=PLAINTEXT://localhost:9092", "port=9092"] )
+@EmbeddedKafka(partitions = 1, topics = [KafkaConstants.KAFKA_TOPIC])
 class ChatTest @Autowired constructor(
         private val userRepository: UserRepository,
         private val jwtUtil: JwtUtil
@@ -124,6 +124,8 @@ class ChatTest @Autowired constructor(
         stompSession.subscribe("/topic/$roomId", WakuStompFrameHandler(messageQueue))
 
         val testMessage = Chatting(roomId, content = "${user.nickname} 님이 접속하였습니다.")
+
+        Thread.sleep(1000)
 
         val records = KafkaTestUtils.getRecords(consumer)
         val receivedMessage = records.records(KafkaConstants.KAFKA_TOPIC).iterator().next().value()
