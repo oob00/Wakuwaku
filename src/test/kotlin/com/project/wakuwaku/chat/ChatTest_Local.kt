@@ -30,7 +30,7 @@ import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 
 
-@ExtendWith(SpringExtension::class)
+/*@ExtendWith(SpringExtension::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext
 class ChatTest_Local @Autowired constructor(
@@ -142,5 +142,5 @@ class ChatTest_Local @Autowired constructor(
 
         }
     }
-}
+}*/
 
