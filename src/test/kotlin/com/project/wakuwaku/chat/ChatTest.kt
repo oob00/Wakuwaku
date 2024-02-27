@@ -179,13 +179,5 @@ class ChatTest @Autowired constructor(
 
         return newUser
     }
-
-    companion object {
-        @JvmStatic
-        @BeforeAll
-        fun setUpAll(): Unit {
-
-        }
-    }
 }
 
