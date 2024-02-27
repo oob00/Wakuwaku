@@ -50,8 +50,7 @@ import java.util.concurrent.TimeUnit
 @EmbeddedKafka(partitions = 1, topics = [KafkaConstants.KAFKA_TOPIC])
 class ChatTest @Autowired constructor(
         private val userRepository: UserRepository,
-        private val jwtUtil: JwtUtil,
-        private var embeddedKafkaBroker: EmbeddedKafkaBroker
+        private val jwtUtil: JwtUtil
 ){
     private lateinit var messageQueue: LinkedBlockingQueue<Chatting>
 
@@ -67,6 +66,9 @@ class ChatTest @Autowired constructor(
 
     @Autowired
     private lateinit var stompHandler: StompHandler
+
+    @Autowired
+    private lateinit var embeddedKafkaBroker: EmbeddedKafkaBroker
 
     private lateinit var consumer: Consumer<String, KafkaMessageDto>
 
@@ -85,7 +87,7 @@ class ChatTest @Autowired constructor(
         stompClient.messageConverter = MappingJackson2MessageConverter()
 
         // Connection
-        stompSession = stompClient.connect(wsUrl, headers, null, object : StompSessionHandlerAdapter() {
+        stompSession = stompClient.connectAsync(wsUrl, headers, null, object : StompSessionHandlerAdapter() {
         }).get(60, TimeUnit.SECONDS)
 
 
@@ -123,7 +125,7 @@ class ChatTest @Autowired constructor(
 
         val testMessage = Chatting(roomId, content = "${user.nickname} 님이 접속하였습니다.")
 
-        Thread.sleep(3000)
+        Thread.sleep(1000)
 
         val records = KafkaTestUtils.getRecords(consumer)
         val receivedMessage = records.records(KafkaConstants.KAFKA_TOPIC).iterator().next().value()
@@ -144,7 +146,7 @@ class ChatTest @Autowired constructor(
         val testMessage = Chatting(roomId, content = "안녕하세요")
         stompSession.send("/pub/message", testMessage)
 
-        Thread.sleep(3000)
+        Thread.sleep(1000)
 
         val records = KafkaTestUtils.getRecords(consumer)
         val receivedMessage = records.records(KafkaConstants.KAFKA_TOPIC).iterator().next().value()
