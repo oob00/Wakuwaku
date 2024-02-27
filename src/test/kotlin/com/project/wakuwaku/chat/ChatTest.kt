@@ -50,7 +50,8 @@ import java.util.concurrent.TimeUnit
 @EmbeddedKafka(partitions = 1, topics = [KafkaConstants.KAFKA_TOPIC])
 class ChatTest @Autowired constructor(
         private val userRepository: UserRepository,
-        private val jwtUtil: JwtUtil
+        private val jwtUtil: JwtUtil,
+        private var embeddedKafkaBroker: EmbeddedKafkaBroker
 ){
     private lateinit var messageQueue: LinkedBlockingQueue<Chatting>
 
@@ -66,9 +67,6 @@ class ChatTest @Autowired constructor(
 
     @Autowired
     private lateinit var stompHandler: StompHandler
-
-    @Autowired
-    private lateinit var embeddedKafkaBroker: EmbeddedKafkaBroker
 
     private lateinit var consumer: Consumer<String, KafkaMessageDto>
 
