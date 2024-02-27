@@ -125,7 +125,7 @@ class ChatTest @Autowired constructor(
 
         val testMessage = Chatting(roomId, content = "${user.nickname} 님이 접속하였습니다.")
 
-        Thread.sleep(1000)
+        Thread.sleep(3000)
 
         val records = KafkaTestUtils.getRecords(consumer)
         val receivedMessage = records.records(KafkaConstants.KAFKA_TOPIC).iterator().next().value()
@@ -146,7 +146,7 @@ class ChatTest @Autowired constructor(
         val testMessage = Chatting(roomId, content = "안녕하세요")
         stompSession.send("/pub/message", testMessage)
 
-        Thread.sleep(1000)
+        Thread.sleep(3000)
 
         val records = KafkaTestUtils.getRecords(consumer)
         val receivedMessage = records.records(KafkaConstants.KAFKA_TOPIC).iterator().next().value()
