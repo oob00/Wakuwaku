@@ -90,6 +90,7 @@ class ChatTest @Autowired constructor(
         stompSession = stompClient.connectAsync(wsUrl, headers, null, object : StompSessionHandlerAdapter() {
         }).get(60, TimeUnit.SECONDS)
 
+        Thread.sleep(1000)
 
         val producerProps = KafkaTestUtils.producerProps(embeddedKafkaBroker)
         val producerFactory = DefaultKafkaProducerFactory<String, KafkaMessageDto>(producerProps, StringSerializer(), JsonSerializer<KafkaMessageDto>())
