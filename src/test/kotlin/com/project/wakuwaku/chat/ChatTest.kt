@@ -46,8 +46,7 @@ import java.util.concurrent.TimeUnit
 
 @ExtendWith(SpringExtension::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@DirtiesContext
-@EmbeddedKafka(partitions = 1, topics = [KafkaConstants.KAFKA_TOPIC])
+@EmbeddedKafka(partitions = 2, topics = [KafkaConstants.KAFKA_TOPIC])
 class ChatTest @Autowired constructor(
         private val userRepository: UserRepository,
         private val jwtUtil: JwtUtil

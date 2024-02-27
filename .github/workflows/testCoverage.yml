@@ -21,7 +21,6 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-            /home/runner/work/Wakuwaku/Wakuwaku/build/reports/tests/test/index.html
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
@@ -32,14 +31,11 @@ jobs:
           java-version: '17'
           distribution: 'corretto'
 
-      - name: Show test reports
-        run: cat /home/runner/work/Wakuwaku/Wakuwaku/build/reports/tests/test/index.html
-
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
       - name: Test with Gradle
-        run: ./gradlew test
+        run: ./gradlew build
 
       - name: Report to CodeCov
         uses: codecov/codecov-action@v4.0.1
