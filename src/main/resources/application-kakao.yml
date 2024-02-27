@@ -4,8 +4,8 @@ spring:
       client:
         registration:
           kakao:
-            client-id: ${{ secrets.KAKAO_CLIENT_ID }}
-            client-secret: ${{ secrets.KAKAO_CLIENT_SECRET }}
+            client-id: test-client-id
+            client-secret: test-client-secret
             redirect-uri: http://localhost:8080/index
             client-authentication-method: POST
             authorization-grant-type: authorization_code
