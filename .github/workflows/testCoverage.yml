@@ -35,7 +35,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Test with Gradle
-        run: ./gradlew build
+        run: ./gradlew build jacocoTestReport
 
       - name: Report to CodeCov
         uses: codecov/codecov-action@v4.0.1
