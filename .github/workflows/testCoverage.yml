@@ -3,10 +3,10 @@ name: Code Coverage sample
 on:
   push:
     branches:
-      - 'master'
+      - 'workflow'
   pull_request:
     branches:
-      - 'master'
+      - 'workflow'
 
 jobs:
   code-coverage:
