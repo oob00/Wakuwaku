@@ -19,13 +19,13 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '17'
-          distribution: 'adopt'
+          distribution: 'corretto'
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
       - name: Test with Gradle
-        run: ./gradlew build jacocoTestReport
+        run: ./gradlew build
 
 
       - name: Report to CodeCov
