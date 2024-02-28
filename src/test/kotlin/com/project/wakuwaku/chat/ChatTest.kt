@@ -112,9 +112,9 @@ class ChatTest @Autowired constructor(
 
     @AfterEach
     fun tearDown(){
-        consumer.close()
-        stompClient.stop()
         stompSession.disconnect()
+        stompClient.stop()
+        consumer.close()
     }
 
     @Test
