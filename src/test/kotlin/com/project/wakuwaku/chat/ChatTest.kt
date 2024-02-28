@@ -120,53 +120,40 @@ class ChatTest @Autowired constructor(
     @Test
     fun `입장 메세지 확인`() {
 
-        try {
+        val roomId = "roomId"
 
-            val roomId = "roomId"
+        stompSession.subscribe("/topic/$roomId", WakuStompFrameHandler(messageQueue))
 
-            stompSession.subscribe("/topic/$roomId", WakuStompFrameHandler(messageQueue))
+        val testMessage = Chatting(roomId, content = "${user.nickname} 님이 접속하였습니다.")
 
-            val testMessage = Chatting(roomId, content = "${user.nickname} 님이 접속하였습니다.")
+        Thread.sleep(1000)
 
-            Thread.sleep(1000)
+        val records = KafkaTestUtils.getRecords(consumer)
+        val receivedMessage = records.records(KafkaConstants.KAFKA_TOPIC).iterator().next().value()
 
-            val records = KafkaTestUtils.getRecords(consumer)
-            val receivedMessage = records.records(KafkaConstants.KAFKA_TOPIC).iterator().next().value()
-
-            Assertions.assertEquals(testMessage.content, receivedMessage.content)
-
-        }catch (e: Exception){
-            println(e)
-            e.printStackTrace()
-        }
+        Assertions.assertEquals(testMessage.content, receivedMessage.content)
 
     }
 
     @Test
     fun `채팅 메세지 확인`() {
 
-        try {
-            val roomId = "roomId"
+        val roomId = "roomId"
 
-            stompSession.subscribe("/topic/$roomId", WakuStompFrameHandler(messageQueue))
+        stompSession.subscribe("/topic/$roomId", WakuStompFrameHandler(messageQueue))
 
-            //접속 메세지 제외
-            KafkaTestUtils.getRecords(consumer).records(KafkaConstants.KAFKA_TOPIC).iterator().next().value()
+        //접속 메세지 제외
+        KafkaTestUtils.getRecords(consumer).records(KafkaConstants.KAFKA_TOPIC).iterator().next().value()
 
-            val testMessage = Chatting(roomId, content = "안녕하세요")
-            stompSession.send("/pub/message", testMessage)
+        val testMessage = Chatting(roomId, content = "안녕하세요")
+        stompSession.send("/pub/message", testMessage)
 
-            Thread.sleep(1000)
+        Thread.sleep(1000)
 
-            val records = KafkaTestUtils.getRecords(consumer)
-            val receivedMessage = records.records(KafkaConstants.KAFKA_TOPIC).iterator().next().value()
+        val records = KafkaTestUtils.getRecords(consumer)
+        val receivedMessage = records.records(KafkaConstants.KAFKA_TOPIC).iterator().next().value()
 
-            Assertions.assertEquals(testMessage.content, receivedMessage.content)
-
-        }catch (e: Exception){
-            println(e)
-            e.printStackTrace()
-        }
+        Assertions.assertEquals(testMessage.content, receivedMessage.content)
     }
 
 
