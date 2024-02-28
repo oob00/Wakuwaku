@@ -81,6 +81,9 @@ tasks.withType(KotlinCompile) {
 }
 
 tasks.named('test') {
+	testLogging {
+		exceptionFormat = 'full'
+	}
 	useJUnitPlatform()
 	finalizedBy jacocoTestReport
 }
