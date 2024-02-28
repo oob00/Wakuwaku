@@ -88,7 +88,7 @@ class ChatTest @Autowired constructor(
 
         // Connection
         stompSession = stompClient.connectAsync(wsUrl, headers, null, object : StompSessionHandlerAdapter() {
-        }).get(60, TimeUnit.SECONDS)
+        }).get(10, TimeUnit.SECONDS)
 
         Thread.sleep(1000)
 
@@ -112,9 +112,9 @@ class ChatTest @Autowired constructor(
 
     @AfterEach
     fun tearDown(){
-        stompSession.disconnect()
-        stompClient.stop()
         consumer.close()
+        stompClient.stop()
+        stompSession.disconnect()
     }
 
     @Test
