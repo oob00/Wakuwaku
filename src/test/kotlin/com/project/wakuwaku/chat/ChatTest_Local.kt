@@ -72,7 +72,7 @@ class ChatTest_Local @Autowired constructor(
         stompClient.stop()
     }
 
-    @Test
+    //@Test
     fun `입장 메세지 확인 - 로컬 카프카 기동 필요`() {
 
         val roomId = "roomId"
@@ -85,7 +85,7 @@ class ChatTest_Local @Autowired constructor(
         Assertions.assertEquals(testMessage.content, receivedMessage.content)
     }
 
-    @Test
+    //@Test
     fun `채팅 메세지 확인 - 로컬 카프카 기동 필요`() {
 
         val roomId = "roomId"
