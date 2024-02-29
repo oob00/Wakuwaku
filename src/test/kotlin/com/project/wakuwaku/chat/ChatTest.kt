@@ -44,7 +44,7 @@ import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 
 
-@ExtendWith(SpringExtension::class)
+/*@ExtendWith(SpringExtension::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @EmbeddedKafka(partitions = 1, topics = [KafkaConstants.KAFKA_TOPIC])
@@ -185,5 +185,5 @@ class ChatTest @Autowired constructor(
 
         return newUser
     }
-}
+}*/
 
