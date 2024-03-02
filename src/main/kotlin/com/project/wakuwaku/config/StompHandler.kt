@@ -48,6 +48,8 @@ class StompHandler @Autowired constructor (
 
             val user: Users = userRepository.findById(id).get()
 
+            println("println id: $id, nickName: ${user.nickname}")
+
             kafkaTemplate.send(KafkaConstants.KAFKA_TOPIC,KafkaMessageDto(chatRoomId = roomId,senderId = "SYSTEM", senderName = "알림", content = user.nickname+" 님이 접속하였습니다."))
             log.info("SUBSCRIBED {}, {}", sessionId, roomId)
         } else if (StompCommand.DISCONNECT == accessor.command) { // Websocket 연결 종료
