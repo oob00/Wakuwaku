@@ -85,9 +85,6 @@ tasks.named('test') {
 		// 표준 출력을 로깅합니다.
 		showStandardStreams = true
 
-		// 표준 에러를 로깅합니다.
-		showStandardError =  true
-
 		// 테스트가 실패한 경우에만 표준 에러를 로깅합니다.
 		showExceptions = true
 
