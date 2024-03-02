@@ -132,10 +132,19 @@ class ChatTest @Autowired constructor(
 
         val testMessage = Chatting(roomId, content = "${user.nickname} 님이 접속하였습니다.")
 
-        Thread.sleep(1000)
+        var receivedMessage: KafkaMessageDto? = null
 
-        val records = KafkaTestUtils.getRecords(consumer)
-        val receivedMessage = records.records(KafkaConstants.KAFKA_TOPIC).iterator().next().value()
+        // 메시지가 도착할 때까지 기다립니다.
+        while (receivedMessage == null) {
+            val records = KafkaTestUtils.getRecords(consumer)
+            if (records.count() > 0) {
+                receivedMessage = records.records(KafkaConstants.KAFKA_TOPIC).iterator().next().value()
+            }
+            Thread.sleep(1000) // 메시지가 도착하지 않은 경우 잠시 대기합니다.
+        }
+
+        //val records = KafkaTestUtils.getRecords(consumer)
+        //val receivedMessage = records.records(KafkaConstants.KAFKA_TOPIC).iterator().next().value()
 
         Assertions.assertEquals(testMessage.content, receivedMessage.content)
 
@@ -154,10 +163,19 @@ class ChatTest @Autowired constructor(
         val testMessage = Chatting(roomId, content = "안녕하세요")
         stompSession.send("/pub/message", testMessage)
 
-        Thread.sleep(1000)
+        var receivedMessage: KafkaMessageDto? = null
 
-        val records = KafkaTestUtils.getRecords(consumer)
-        val receivedMessage = records.records(KafkaConstants.KAFKA_TOPIC).iterator().next().value()
+        // 메시지가 도착할 때까지 기다립니다.
+        while (receivedMessage == null) {
+            val records = KafkaTestUtils.getRecords(consumer)
+            if (records.count() > 0) {
+                receivedMessage = records.records(KafkaConstants.KAFKA_TOPIC).iterator().next().value()
+            }
+            Thread.sleep(1000) // 메시지가 도착하지 않은 경우 잠시 대기합니다.
+        }
+
+        //val records = KafkaTestUtils.getRecords(consumer)
+        //val receivedMessage = records.records(KafkaConstants.KAFKA_TOPIC).iterator().next().value()
 
         Assertions.assertEquals(testMessage.content, receivedMessage.content)
     }
