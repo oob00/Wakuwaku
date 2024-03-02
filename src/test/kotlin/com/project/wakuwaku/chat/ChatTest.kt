@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
 import org.springframework.kafka.core.DefaultKafkaProducerFactory
 import org.springframework.kafka.core.KafkaTemplate
@@ -44,8 +45,8 @@ import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 
 
-/*@ExtendWith(SpringExtension::class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@ExtendWith(SpringExtension::class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @EmbeddedKafka(partitions = 1, topics = [KafkaConstants.KAFKA_TOPIC])
 class ChatTest @Autowired constructor(
@@ -57,7 +58,10 @@ class ChatTest @Autowired constructor(
     private lateinit var stompClient: WebSocketStompClient
     private lateinit var stompSession: StompSession
 
-    private var wsUrl: String = "ws://localhost:8080/chat"
+    @LocalServerPort
+    var serverPort: Int = 0
+
+    private lateinit var wsUrl: String
 
     private lateinit var user: Users
 
@@ -81,6 +85,8 @@ class ChatTest @Autowired constructor(
 
         val headers = WebSocketHttpHeaders() // 헤더에 토큰 삽입
         headers.add("Authorization", jwtUtil.createJwt(user).accessToken)
+
+        wsUrl = "ws://localhost:$serverPort/chat"
 
         // init setting
         stompClient = WebSocketStompClient(SockJsClient(listOf(WebSocketTransport(StandardWebSocketClient()))))
@@ -185,5 +191,5 @@ class ChatTest @Autowired constructor(
 
         return newUser
     }
-}*/
+}
 
