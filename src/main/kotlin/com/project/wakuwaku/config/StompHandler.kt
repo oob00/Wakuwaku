@@ -22,7 +22,7 @@ import kotlin.jvm.optionals.getOrNull
 
 @Component
 class StompHandler @Autowired constructor (
-        private val chatroomService : ChatRoomService,
+        var chatroomService : ChatRoomService,
         var kafkaTemplate: KafkaTemplate<String, KafkaMessageDto>,
         private val userRepository: UserRepository
 ) : ChannelInterceptor {
