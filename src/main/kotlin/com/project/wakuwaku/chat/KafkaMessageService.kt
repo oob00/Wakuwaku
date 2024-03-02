@@ -26,7 +26,6 @@ class KafkaMessageService @Autowired constructor(
     //producer
     fun send(topic: String?, messageDto: Chatting) {
         log.info("send Message : " + messageDto.content)
-        println("println send Message : " + messageDto.content)
         try {
             val responseMessageDto: KafkaMessageDto = chatService.SaveAndChangeToMessageResponseDto(messageDto)
             kafkaTemplate.send(topic!!, responseMessageDto)
@@ -41,7 +40,6 @@ class KafkaMessageService @Autowired constructor(
     @Throws(IOException::class)
     fun consume(responseMessageDto: KafkaMessageDto) {
         log.info("consume Message : " + responseMessageDto.content)
-        println("println consume Message : " + responseMessageDto.content)
         template?.convertAndSend("/topic/" + responseMessageDto.chatRoomId, responseMessageDto)
     }
 }

@@ -7,13 +7,11 @@ import com.project.wakuwaku.model.jpa.user.UserRepository
 import com.project.wakuwaku.model.jpa.user.Users
 import com.project.wakuwaku.model.kafka.KafkaMessageDto
 import com.project.wakuwaku.model.mongo.Chatting
-import com.project.wakuwaku.redis.RedisTest
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.kafka.common.serialization.StringSerializer
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
