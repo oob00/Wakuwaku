@@ -12,12 +12,14 @@ import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.kafka.common.serialization.StringSerializer
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.web.server.LocalServerPort
+import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
 import org.springframework.kafka.core.DefaultKafkaProducerFactory
 import org.springframework.kafka.core.KafkaTemplate
@@ -32,32 +34,69 @@ import org.springframework.messaging.simp.stomp.StompHeaders
 import org.springframework.messaging.simp.stomp.StompSession
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter
 import org.springframework.test.annotation.DirtiesContext
+import org.springframework.test.context.DynamicPropertyRegistry
+import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.web.socket.WebSocketHttpHeaders
 import org.springframework.web.socket.client.standard.StandardWebSocketClient
 import org.springframework.web.socket.messaging.WebSocketStompClient
 import org.springframework.web.socket.sockjs.client.SockJsClient
 import org.springframework.web.socket.sockjs.client.WebSocketTransport
+import org.testcontainers.containers.GenericContainer
+import org.testcontainers.containers.output.Slf4jLogConsumer
+import org.testcontainers.junit.jupiter.Container
+import org.testcontainers.junit.jupiter.Testcontainers
+import org.testcontainers.utility.DockerImageName
 import java.lang.reflect.Type
 import java.time.LocalDateTime
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 
 
-/*@ExtendWith(SpringExtension::class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@ExtendWith(SpringExtension::class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @EmbeddedKafka(partitions = 1, topics = [KafkaConstants.KAFKA_TOPIC])
+@Testcontainers
 class ChatTest @Autowired constructor(
         private val userRepository: UserRepository,
         private val jwtUtil: JwtUtil
 ){
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(ChatTest::class.java)
+
+        @Container
+        val redisContainer: GenericContainer<*> = GenericContainer(DockerImageName.parse("redis:latest"))
+            .withExposedPorts(6379)
+            .withReuse(true)
+            .apply {
+                withLogConsumer(Slf4jLogConsumer(logger))
+            }
+
+        @JvmStatic
+        @DynamicPropertySource
+        fun redisProperties(registry: DynamicPropertyRegistry) {
+            println("Redis Host: ${redisContainer.host}, Port: ${redisContainer.getMappedPort(6379)}") // 디버깅 목적
+            registry.add("spring.data.redis.host") { redisContainer.host }
+            registry.add("spring.data.redis.port") { redisContainer.getMappedPort(6379).toString() }
+        }
+    }
+
+    @Autowired
+    private lateinit var redisTemplate: RedisTemplate<String, String>
+
+    private lateinit var chatRoomService: ChatRoomService
+
     private lateinit var messageQueue: LinkedBlockingQueue<Chatting>
 
     private lateinit var stompClient: WebSocketStompClient
     private lateinit var stompSession: StompSession
 
-    private var wsUrl: String = "ws://localhost:8080/chat"
+    @LocalServerPort
+    var serverPort: Int = 0
+
+    private lateinit var wsUrl: String
 
     private lateinit var user: Users
 
@@ -76,11 +115,14 @@ class ChatTest @Autowired constructor(
     fun setup() {
 
         messageQueue = LinkedBlockingQueue()
+        chatRoomService = ChatRoomService(redisTemplate)
 
         user = CreateUser()
 
         val headers = WebSocketHttpHeaders() // 헤더에 토큰 삽입
         headers.add("Authorization", jwtUtil.createJwt(user).accessToken)
+
+        wsUrl = "ws://localhost:$serverPort/chat"
 
         // init setting
         stompClient = WebSocketStompClient(SockJsClient(listOf(WebSocketTransport(StandardWebSocketClient()))))
@@ -98,6 +140,7 @@ class ChatTest @Autowired constructor(
 
         kafkaMessageService.kafkaTemplate = kafkaTemplate
         stompHandler.kafkaTemplate = kafkaTemplate
+        stompHandler.chatroomService = chatRoomService
 
         val consumerProps = KafkaTestUtils.consumerProps("testGroup", "true", embeddedKafkaBroker)
         consumerProps["key.deserializer"] = StringDeserializer::class.java
@@ -185,5 +228,5 @@ class ChatTest @Autowired constructor(
 
         return newUser
     }
-}*/
+}
 
