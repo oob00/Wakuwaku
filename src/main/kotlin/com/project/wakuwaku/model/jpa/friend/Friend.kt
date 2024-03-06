@@ -23,7 +23,7 @@ class Friend(
     var isFriend: Boolean = isFriend
         private set
 
-    fun updateIsFriend(isFriend: Boolean) {
+    fun acceptFriend(isFriend: Boolean) {
         this.isFriend = isFriend
     }
 }

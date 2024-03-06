@@ -24,7 +24,7 @@ class FriendController(
     fun requestFriend(@RequestBody id: String, friendId: String): ResponseEntity<String> {
         val result = friendService.requestFriend(id, friendId)
 
-        return ResponseEntity.ok(if (result) "success" else "fail")
+        return ResponseEntity.ok(if (result != null) "success" else "fail")
     }
 
     @PostMapping("/received/list")
@@ -38,6 +38,6 @@ class FriendController(
     fun acceptFriend(@RequestBody id: String, friendId: String): ResponseEntity<String> {
         val result = friendService.acceptFriend(id, friendId)
 
-        return ResponseEntity.ok(if (result) "success" else "fail")
+        return ResponseEntity.ok(if (result != null) "success" else "fail")
     }
 }
