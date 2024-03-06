@@ -74,7 +74,7 @@ class FriendTest @Autowired constructor(
     fun testRequestFriend() {
         val result = friendService.requestFriend("id", "friendId")
 
-        assertEquals(true, result)
+        assertEquals("id", result)
     }
 
     @DisplayName("받은 친구 요청 조회")
@@ -144,6 +144,6 @@ class FriendTest @Autowired constructor(
 
         val result = friendService.acceptFriend("id", "friend")
 
-        assertEquals(true, result)
+        assertEquals("id", result)
     }
 }

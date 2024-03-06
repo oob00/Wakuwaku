@@ -28,9 +28,9 @@ class FriendService(
         return friends
     }
 
-    fun requestFriend(id: String, friendId: String): Boolean {
+    fun requestFriend(id: String, friendId: String): String? {
         return try {
-            friendRepository.save(
+            val friend = friendRepository.save(
                 Friend(
                     id = id,
                     friendId = friendId,
@@ -40,10 +40,10 @@ class FriendService(
                 )
             )
 
-            true
+            friend.id
         } catch (e: Exception) {
             log.error("친구 추가 요청 에러 : " + e.message)
-            false
+            null
         }
     }
 
@@ -60,13 +60,15 @@ class FriendService(
         return receivedRequest
     }
 
-    fun acceptFriend(id: String, friendId: String): Boolean {
+    fun acceptFriend(id: String, friendId: String): String? {
         return try {
-            val friend = friendRepository.findById(friendId)
-            friend.updateIsFriend(true)
-            friendRepository.save(friend)
+            // 요청자의 친구요청을 가져와서 친구 수락한 상태로 변경
+            val request = friendRepository.findById(friendId)
+            request.acceptFriend(true)
+            friendRepository.save(request)
 
-            friendRepository.save(
+            // 내 친구목록에 요청자 추가
+            val accept = friendRepository.save(
                 Friend(
                     id = id,
                     friendId = friendId,
@@ -76,10 +78,10 @@ class FriendService(
                 )
             )
 
-            true
+            accept.id
         } catch (e: Exception) {
             log.error("친구 요청 수락 에러 : " + e.message)
-            false
+            null
         }
     }
 }
