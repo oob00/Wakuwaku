@@ -9,5 +9,5 @@ interface FriendRepository : JpaRepository<Friend, Long> {
 
     fun findAllByFriendIdAndIsFriend(friendId: String, isFriend: Boolean): List<Friend>
 
-    fun findById(id: String): Friend
+    fun findByIdAndFriendId(id: String, friendId: String): Friend
 }

@@ -62,26 +62,32 @@ class FriendService(
 
     fun acceptFriend(id: String, friendId: String): String? {
         return try {
-            // 요청자의 친구요청을 가져와서 친구 수락한 상태로 변경
-            val request = friendRepository.findById(friendId)
-            request.acceptFriend(true)
+            // 요청자의 친구요청을 가져와서 친구 요청 수락 상태로 변경
+            val request = friendRepository.findByIdAndFriendId(friendId, id)
+            request.acceptFriend()
             friendRepository.save(request)
 
-            // 내 친구목록에 요청자 추가
-            val accept = friendRepository.save(
-                Friend(
-                    id = id,
-                    friendId = friendId,
-                    isFriend = true,
-                    createDt = LocalDateTime.now(),
-                    updateDt = LocalDateTime.now()
-                )
-            )
+            // 요청자를 내 친구목록에 추가
+            val myId = addRequesterToMyFriendList(request)
 
-            accept.id
+            myId
         } catch (e: Exception) {
             log.error("친구 요청 수락 에러 : " + e.message)
             null
         }
+    }
+
+    private fun addRequesterToMyFriendList(request: Friend): String {
+        val accept = friendRepository.save(
+            Friend(
+                id = request.friendId,
+                friendId = request.id,
+                isFriend = true,
+                createDt = LocalDateTime.now(),
+                updateDt = LocalDateTime.now()
+            )
+        )
+
+        return accept.id
     }
 }
