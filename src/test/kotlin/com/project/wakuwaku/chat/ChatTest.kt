@@ -160,7 +160,7 @@ class ChatTest @Autowired constructor(
         consumer.close()
     }
 
-    //@Test
+    @Test
     fun `입장 메세지 확인`() {
 
         val roomId = "roomId"
@@ -178,7 +178,7 @@ class ChatTest @Autowired constructor(
 
     }
 
-    //@Test
+    @Test
     fun `채팅 메세지 확인`() {
 
         val roomId = "roomId"
